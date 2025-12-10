@@ -5,9 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
+  constructor(private readonly usersService: UsersService) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
@@ -20,7 +23,13 @@ export class FirebaseAuthGuard implements CanActivate {
 
     try {
       const decoded = await admin.auth().verifyIdToken(token);
-      request.user = decoded; // ahora cualquier controller puede usar req.user
+
+      const user = await this.usersService.findOneByUid(decoded.uid);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      request.user = user; // ahora request.user es la entidad User completa
+
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');

@@ -2,10 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FirebaseAuthGuard } from 'src/auth/guards/firebase-auth.guard';
-import { OwnerGuard } from 'src/auth/guards/owner.guard';
+import { UserOwnerGuard } from 'src/auth/guards/userOwner.guard';
+
 
 @Controller('users')
 export class UsersController {
@@ -28,13 +27,13 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @UseGuards(FirebaseAuthGuard, OwnerGuard)
+  @UseGuards(FirebaseAuthGuard, UserOwnerGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @UseGuards(FirebaseAuthGuard, OwnerGuard)
+  @UseGuards(FirebaseAuthGuard, UserOwnerGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);

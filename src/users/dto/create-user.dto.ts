@@ -3,6 +3,10 @@ import { Role } from 'src/common/role.enum';
 
 export class CreateUserDto {
   @IsString()
+  @IsNotEmpty()
+  uid: string;
+
+  @IsString()
   @IsEmail()
   @IsNotEmpty()
   @Length(6, 80)
