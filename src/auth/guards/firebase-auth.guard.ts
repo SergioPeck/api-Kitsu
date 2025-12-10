@@ -23,11 +23,13 @@ export class FirebaseAuthGuard implements CanActivate {
 
     try {
       const decoded = await admin.auth().verifyIdToken(token);
+
       const user = await this.usersService.findOneByUid(decoded.uid);
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
       request.user = user; // ahora request.user es la entidad User completa
+
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');

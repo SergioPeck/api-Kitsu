@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FirebaseAuthGuard } from 'src/auth/guards/firebase-auth.guard';
 import { UserOwnerGuard } from 'src/auth/guards/userOwner.guard';
 
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -14,6 +15,8 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get()
   findAll() {
     return this.usersService.findAll();
