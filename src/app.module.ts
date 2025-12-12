@@ -16,13 +16,9 @@ import { ChapterViewsModule } from './chapter-views/chapter-views.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      // SUPABASE
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-
       autoLoadEntities: true,
-
-      // Solo para desarrollo / primeras pruebas.
       synchronize: true,
+      ssl: false,
     }),
 
     // Tus módulos
