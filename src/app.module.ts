@@ -9,20 +9,22 @@ import { ChapterViewsModule } from './chapter-views/chapter-views.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: false,
+      ssl: true,
+      extra: {
+        ssl: { rejectUnauthorized: false }
+      }
     }),
 
-    // Tus módulos
+    // IMPORTAR USERSMODULE PRIMERO
     UsersModule,
+
     AuthModule,
     MangaModule,
     ChaptersModule,
