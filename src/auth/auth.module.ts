@@ -4,8 +4,10 @@ import { AuthController } from './auth.controller';
 import { FirebaseAuthGuard } from './guards/firebase-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
+  imports: [UsersModule],
   controllers: [AuthController],
   providers: [
     AuthService,
