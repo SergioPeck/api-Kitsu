@@ -16,10 +16,7 @@ import { ChapterViewsModule } from './chapter-views/chapter-views.module';
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: true,
-      extra: {
-        ssl: { rejectUnauthorized: false }
-      }
+      ssl: process.env.DB_SSL === 'false' ? { rejectUnauthorized: false } : false,
     }),
 
     // IMPORTAR USERSMODULE PRIMERO
