@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { Manga } from '../../mangas/entities/mangas.entity';
 import { ChapterView } from 'src/chapter-views/entities/chapter-view.entity';
 
@@ -21,14 +28,17 @@ export class Chapter {
   })
   totalViews: number;
 
-  @ManyToOne(() => Manga, manga => manga.chapters, {
+  @ManyToOne(() => Manga, (manga) => manga.chapters, {
     onDelete: 'CASCADE',
   })
   manga: Manga;
 
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
   @Column()
   mangaId: string;
-  
-  @OneToMany(() => ChapterView, view => view.chapter)
+
+  @OneToMany(() => ChapterView, (view) => view.chapter)
   views: ChapterView[];
 }

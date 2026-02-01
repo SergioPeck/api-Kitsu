@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Chapter } from '../../chapters/entities/chapter.entity';
 import { StatusManga } from 'src/common/statusManga.enum';
 import { OriginManga } from 'src/common/originManga.enum';
@@ -23,8 +30,16 @@ export class Manga {
     default: StatusManga.ONGOING,
     nullable: false,
   })
-  status:StatusManga;
+  status: StatusManga;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastChapterAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
   @Column({
     type: 'enum',
     enum: OriginManga,
@@ -33,7 +48,7 @@ export class Manga {
   })
   origin: OriginManga;
 
-  @OneToMany(() => Chapter, chapter => chapter.manga)
+  @OneToMany(() => Chapter, (chapter) => chapter.manga)
   chapters: Chapter[];
 
   @Column()
