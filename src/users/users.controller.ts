@@ -6,6 +6,7 @@ import { FirebaseAuthGuard } from 'src/auth/guards/firebase-auth.guard';
 import { UserOwnerGuard } from 'src/auth/guards/userOwner.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Public } from 'src/auth/guards/public.decorator';
 
 
 @Controller('users')
@@ -24,6 +25,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);

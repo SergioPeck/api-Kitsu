@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { MangaService } from './mangas.service';
 import { CreateMangaDto } from './dto/create-mangas.dto';
 import { UpdateMangaDto } from './dto/update-mangas.dto';
@@ -6,6 +15,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { FirebaseAuthGuard } from 'src/auth/guards/firebase-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { MangaOwnerGuard } from 'src/auth/guards/mangaOwner.guard';
+import { Public } from 'src/auth/guards/public.decorator';
 
 @Controller('manga')
 export class MangaController {
@@ -18,14 +28,22 @@ export class MangaController {
     return this.mangaService.create(dto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.mangaService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.mangaService.findOne(id);
+  }
+
+  @Public()
+  @Get('recent/updates')
+  getRecentlyUpdated() {
+    return this.mangaService.getRecentlyUpdated();
   }
 
   @UseGuards(FirebaseAuthGuard, RolesGuard, MangaOwnerGuard)

@@ -35,6 +35,15 @@ export class MangaService {
     return manga;
   }
 
+  async getRecentlyUpdated() {
+    return this.mangaRepo.find({
+      order: {
+        lastChapterAt: 'DESC',
+      },
+      take: 10,
+    });
+  }
+
   async update(id: string, dto: UpdateMangaDto) {
     const manga = await this.findOne(id);
     Object.assign(manga, dto);
@@ -51,13 +60,12 @@ export class MangaService {
       where: { id: mangaId },
       relations: ['chapters'],
     });
-    
+
     if (!manga) {
       throw new NotFoundException('Manga not found');
     }
-    const chapterIds = manga.chapters.map(ch => ch.id);
+    const chapterIds = manga.chapters.map((ch) => ch.id);
 
     return this.chapterViewsService.getMonthlyViewsForManga(chapterIds);
   }
-
 }
