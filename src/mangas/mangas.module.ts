@@ -5,9 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Manga } from './entities/mangas.entity';
 import { ChapterViewsModule } from '../chapter-views/chapter-views.module';
 import { UsersModule } from 'src/users/users.module';
+import { Chapter } from 'src/chapters/entities/chapter.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Manga]), ChapterViewsModule, UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Manga]),
+    TypeOrmModule.forFeature([Chapter]),
+    ChapterViewsModule,
+    UsersModule,
+  ],
   controllers: [MangaController],
   providers: [MangaService],
   exports: [MangaService],
