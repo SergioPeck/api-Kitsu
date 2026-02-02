@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { MangaService } from './mangas.service';
 import { CreateMangaDto } from './dto/create-mangas.dto';
@@ -18,6 +19,11 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { MangaOwnerGuard } from 'src/auth/guards/mangaOwner.guard';
 import { Public } from 'src/auth/guards/public.decorator';
 import { RecentMangaResponse } from 'src/common/recent-manga.type';
+import { ChapterListItemDto } from './dto/chapter-list-item.dto';
+
+export type ChaptersResponse = {
+  chapters: ChapterListItemDto[];
+};
 
 @Controller('manga')
 export class MangaController {
@@ -55,6 +61,20 @@ export class MangaController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.mangaService.findOne(id);
+  }
+
+  @Public()
+  @Get(':mangaId/chapters')
+  async getChapters(
+    @Param('mangaId') mangaId: string,
+  ): Promise<ChaptersResponse> {
+    const chapters = await this.mangaService.getChaptersByManga(mangaId);
+
+    if (!chapters) {
+      throw new NotFoundException('Manga not found');
+    }
+
+    return { chapters };
   }
 
   @UseGuards(FirebaseAuthGuard, RolesGuard, MangaOwnerGuard)
