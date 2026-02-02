@@ -5,6 +5,7 @@ import { Manga } from './entities/mangas.entity';
 import { CreateMangaDto } from './dto/create-mangas.dto';
 import { UpdateMangaDto } from './dto/update-mangas.dto';
 import { ChapterViewsService } from 'src/chapter-views/chapter-views.service';
+import { ChapterListItemDto } from './dto/chapter-list-item.dto';
 import {
   RecentMangaItem,
   RecentMangaResponse,
@@ -51,6 +52,32 @@ export class MangaService {
 
     if (!manga) throw new NotFoundException('Manga not found');
     return manga;
+  }
+
+  async getChaptersByManga(
+    mangaId: string,
+  ): Promise<ChapterListItemDto[] | null> {
+    const mangaExists = await this.mangaRepo.exists({
+      where: { id: mangaId },
+    });
+
+    if (!mangaExists) {
+      return null;
+    }
+
+    const entities = await this.chapterRepo.find({
+      where: { manga: { id: mangaId } },
+      order: { chapterNumber: 'ASC' },
+      select: ['id', 'chapterNumber', 'title'],
+    });
+
+    const chapters: ChapterListItemDto[] = entities.map((c) => ({
+      id: c.id,
+      chapterNumber: c.chapterNumber,
+      title: c.title,
+    }));
+
+    return chapters;
   }
 
   async getRecentlyUpdated() {
