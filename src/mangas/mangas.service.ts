@@ -47,7 +47,6 @@ export class MangaService {
   async findOne(id: string) {
     const manga = await this.mangaRepo.findOne({
       where: { id },
-      relations: ['chapters'],
     });
 
     if (!manga) throw new NotFoundException('Manga not found');
