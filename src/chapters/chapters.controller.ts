@@ -11,6 +11,7 @@ import { ChaptersService } from './chapters.service';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { Public } from 'src/auth/guards/public.decorator';
+import { ChapterReaderResponse } from './types/chapter-reader-response';
 
 @Controller('chapters')
 export class ChaptersController {
@@ -28,9 +29,11 @@ export class ChaptersController {
   }
 
   @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chaptersService.findOne(id);
+  @Get(':chapterId')
+  getChapter(
+    @Param('chapterId') chapterId: string,
+  ): Promise<ChapterReaderResponse> {
+    return this.chaptersService.getChapterWithNavigation(chapterId);
   }
 
   @Patch(':id')
