@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { MangaModule } from './mangas/mangas.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { ChapterViewsModule } from './chapter-views/chapter-views.module';
+import { RankingsModule } from './rankings/rankings.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ChapterViewsModule } from './chapter-views/chapter-views.module';
     MangaModule,
     ChaptersModule,
     ChapterViewsModule,
+    RankingsModule,
   ],
 })
 export class AppModule {}
