@@ -7,6 +7,7 @@ import { MangaModule } from './mangas/mangas.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { ChapterViewsModule } from './chapter-views/chapter-views.module';
 import { RankingsModule } from './rankings/rankings.module';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RankingsModule } from './rankings/rankings.module';
     ChaptersModule,
     ChapterViewsModule,
     RankingsModule,
+    BannersModule,
   ],
 })
 export class AppModule {}
