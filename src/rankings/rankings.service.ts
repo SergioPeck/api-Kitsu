@@ -4,7 +4,6 @@ import { Manga } from 'src/mangas/entities/mangas.entity';
 import { Repository } from 'typeorm';
 import { MangaHistoricRankingDto } from './dto/manga-historic-ranking.dto';
 import { RankingRange } from './types/rankings.types';
-import { ChapterView } from 'src/chapter-views/entities/chapter-view.entity';
 
 type MangaHistoricRankingRaw = {
   id: string;
@@ -18,8 +17,6 @@ export class RankingsService {
   constructor(
     @InjectRepository(Manga)
     private readonly mangaRepository: Repository<Manga>,
-    @InjectRepository(ChapterView)
-    private readonly viewRepository: Repository<ChapterView>,
   ) {}
 
   async getHistoricMangaRanking(): Promise<{
@@ -51,17 +48,21 @@ export class RankingsService {
   async getMangaRanking(range: RankingRange) {
     const fromDate = this.getFromDate(range);
 
-    const qb = this.viewRepository
-      .createQueryBuilder('view')
-      .innerJoin('view.chapter', 'chapter')
-      .innerJoin('chapter.manga', 'manga')
+    const qb = this.mangaRepository
+      .createQueryBuilder('manga')
+      .leftJoin('manga.chapters', 'chapter')
+      .leftJoin('chapter.views', 'view', 'view.createdAt >= :fromDate', {
+        fromDate,
+      })
       .select('manga.id', 'id')
       .addSelect('manga.title', 'title')
       .addSelect('manga.coverImage', 'coverImage')
       .addSelect('COUNT(view.id)', 'views')
-      .where('view.createdAt >= :fromDate', { fromDate })
       .groupBy('manga.id')
+      .addGroupBy('manga.title')
+      .addGroupBy('manga.coverImage')
       .orderBy('views', 'DESC')
+      .addOrderBy('manga.lastChapterAt', 'DESC', 'NULLS LAST')
       .limit(10);
 
     const items =
