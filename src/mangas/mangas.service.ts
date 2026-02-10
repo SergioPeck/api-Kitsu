@@ -150,7 +150,7 @@ export class MangaService {
     for (const ch of lastChaptersRaw) {
       const list = lastChaptersMap.get(ch.mangaId) ?? [];
 
-      if (list.length < 3) {
+      if (list.length < 2) {
         list.push({
           id: ch.id,
           chapterNumber: ch.chapterNumber,
