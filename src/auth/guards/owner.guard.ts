@@ -12,7 +12,7 @@ export class OwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const resourceId = request.params.id;
+    const resourceId = request.params.slum;
 
     // buscar el recurso (manga, capítulo, lo que sea)
     const resource = await this.resourceService.findOne(resourceId);

@@ -58,17 +58,15 @@ export class MangaController {
   }
 
   @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mangaService.findOne(id);
+  @Get(':slum')
+  findOne(@Param('slum') slum: string) {
+    return this.mangaService.findOne(slum);
   }
 
   @Public()
-  @Get(':mangaId/chapters')
-  async getChapters(
-    @Param('mangaId') mangaId: string,
-  ): Promise<ChaptersResponse> {
-    const chapters = await this.mangaService.getChaptersByManga(mangaId);
+  @Get(':slum/chapters')
+  async getChapters(@Param('slum') slum: string): Promise<ChaptersResponse> {
+    const chapters = await this.mangaService.getChaptersByManga(slum);
 
     if (!chapters) {
       throw new NotFoundException('Manga not found');
@@ -79,14 +77,14 @@ export class MangaController {
 
   @UseGuards(FirebaseAuthGuard, RolesGuard, MangaOwnerGuard)
   @Roles('ADMIN')
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateMangaDto) {
-    return this.mangaService.update(id, dto);
+  @Patch(':slum')
+  update(@Param('slum') slum: string, @Body() dto: UpdateMangaDto) {
+    return this.mangaService.update(slum, dto);
   }
 
   @UseGuards(FirebaseAuthGuard, MangaOwnerGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mangaService.remove(id);
+  @Delete(':slum')
+  remove(@Param('slum') slum: string) {
+    return this.mangaService.remove(slum);
   }
 }

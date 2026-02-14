@@ -57,7 +57,7 @@ export class ChaptersService {
         chapterNumber: LessThan(chapterNumber),
       },
       order: { chapterNumber: 'DESC' },
-      select: ['id'],
+      select: ['id', 'chapterNumber'],
     });
 
     const nextChapter = await this.chapterRepo.findOne({
@@ -65,12 +65,6 @@ export class ChaptersService {
         mangaId,
         chapterNumber: MoreThan(chapterNumber),
       },
-      order: { chapterNumber: 'ASC' },
-      select: ['id'],
-    });
-
-    const chapters = await this.chapterRepo.find({
-      where: { mangaId },
       order: { chapterNumber: 'ASC' },
       select: ['id', 'chapterNumber'],
     });
@@ -82,10 +76,52 @@ export class ChaptersService {
       images: chapter.images,
       mangaId: chapter.mangaId,
       prevChapterId: prevChapter?.id ?? null,
+      prevChapterNumber: prevChapter?.chapterNumber ?? null,
       nextChapterId: nextChapter?.id ?? null,
-      chapters,
+      nextChapterNumber: nextChapter?.chapterNumber ?? null,
     };
   }
+
+  async getReaderByMangaSlugAndNumber(
+    slug: string,
+    chapterNumberParam: string,
+  ): Promise<ChapterReaderResponse> {
+    if (!/^\d+(\.\d+)?$/.test(chapterNumberParam)) {
+      throw new NotFoundException(
+        `Invalid chapter number format: ${chapterNumberParam}`,
+      );
+    }
+
+    const chapterNumber = Number(chapterNumberParam);
+    if (!Number.isFinite(chapterNumber)) {
+      throw new NotFoundException(
+        `Invalid chapter number: ${chapterNumberParam}`,
+      );
+    }
+
+    const manga = await this.mangaRepo.findOne({
+      where: { slug },
+      select: { id: true, title: true, slug: true },
+    });
+
+    if (!manga) {
+      throw new NotFoundException(`Manga not found (slug: ${slug})`);
+    }
+
+    const chapter = await this.chapterRepo.findOne({
+      where: { mangaId: manga.id, chapterNumber },
+      select: ['id'],
+    });
+
+    if (!chapter) {
+      throw new NotFoundException(
+        `Chapter not found (slug: ${slug}, chapter: ${chapterNumberParam})`,
+      );
+    }
+
+    return this.getChapterWithNavigation(chapter.id);
+  }
+
   async findOne(id: string) {
     const chapter = await this.chapterRepo.findOne({ where: { id } });
     if (!chapter) throw new NotFoundException('Chapter not found');

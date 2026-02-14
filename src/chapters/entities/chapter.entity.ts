@@ -5,16 +5,25 @@ import {
   ManyToOne,
   OneToMany,
   CreateDateColumn,
+  Unique,
 } from 'typeorm';
 import { Manga } from '../../mangas/entities/mangas.entity';
 import { ChapterView } from 'src/chapter-views/entities/chapter-view.entity';
 
 @Entity()
+@Unique(['mangaId', 'chapterNumber'])
 export class Chapter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('decimal', {
+    precision: 4,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
   chapterNumber: number;
 
   @Column()

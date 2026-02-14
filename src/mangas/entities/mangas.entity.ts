@@ -5,12 +5,14 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 import { Chapter } from '../../chapters/entities/chapter.entity';
 import { StatusManga } from 'src/common/statusManga.enum';
 import { OriginManga } from 'src/common/originManga.enum';
 
 @Entity()
+@Unique(['slug'])
 export class Manga {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -53,4 +55,7 @@ export class Manga {
 
   @Column()
   uploaderId: string;
+
+  @Column({ unique: true })
+  slug: string;
 }
