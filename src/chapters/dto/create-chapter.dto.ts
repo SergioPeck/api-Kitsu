@@ -1,4 +1,11 @@
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsUUID,
+  IsArray,
+  ArrayNotEmpty,
+  IsString as IsStringEach,
+} from 'class-validator';
 
 export class CreateChapterDto {
   @IsNumber()
@@ -7,8 +14,10 @@ export class CreateChapterDto {
   @IsString()
   title: string;
 
-  @IsOptional()
-  images?: string[];
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsStringEach({ each: true })
+  images: string[];
 
   @IsUUID()
   mangaId: string;

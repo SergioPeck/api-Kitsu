@@ -12,6 +12,7 @@ import {
   ChapterRef,
 } from '../common/recent-manga.type';
 import { Chapter } from 'src/chapters/entities/chapter.entity';
+
 interface RecentMangaRaw {
   manga_id: string;
   manga_title: string;
@@ -34,8 +35,31 @@ export class MangaService {
     private chapterViewsService: ChapterViewsService,
   ) {}
 
-  create(dto: CreateMangaDto) {
-    const manga = this.mangaRepo.create(dto);
+  private generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  async create(dto: CreateMangaDto) {
+    const baseSlug = this.generateSlug(dto.title);
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (await this.mangaRepo.exists({ where: { slug } })) {
+      counter++;
+      slug = `${baseSlug}-${counter}`;
+    }
+
+    const manga = this.mangaRepo.create({
+      ...dto,
+      slug,
+    });
+
     return this.mangaRepo.save(manga);
   }
 
@@ -45,28 +69,25 @@ export class MangaService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(slug: string) {
     const manga = await this.mangaRepo.findOne({
-      where: { id },
+      where: { slug },
     });
 
     if (!manga) throw new NotFoundException('Manga not found');
     return manga;
   }
 
-  async getChaptersByManga(
-    mangaId: string,
-  ): Promise<ChapterListItemDto[] | null> {
-    const mangaExists = await this.mangaRepo.exists({
-      where: { id: mangaId },
+  async getChaptersByManga(slug: string): Promise<ChapterListItemDto[] | null> {
+    const manga = await this.mangaRepo.findOne({
+      where: { slug },
+      select: ['id'],
     });
 
-    if (!mangaExists) {
-      return null;
-    }
+    if (!manga) return null;
 
     const entities = await this.chapterRepo.find({
-      where: { manga: { id: mangaId } },
+      where: { manga: { id: manga.id } },
       order: { chapterNumber: 'ASC' },
       select: ['id', 'chapterNumber', 'title'],
     });
@@ -92,7 +113,6 @@ export class MangaService {
   async getRecentMangas(page = 1, limit = 10): Promise<RecentMangaResponse> {
     const offset = (page - 1) * limit;
 
-    // Last 10 mangas
     const mangas = await this.mangaRepo
       .createQueryBuilder('manga')
       .innerJoin('manga.chapters', 'chapter')
@@ -159,7 +179,6 @@ export class MangaService {
       }
     }
 
-    //response
     const items: RecentMangaItem[] = mangas.map((m) => ({
       id: m.manga_id,
       title: m.manga_title,
@@ -176,28 +195,28 @@ export class MangaService {
     };
   }
 
-  async update(id: string, dto: UpdateMangaDto) {
-    const manga = await this.findOne(id);
+  async update(slum: string, dto: UpdateMangaDto) {
+    const manga = await this.findOne(slum);
     Object.assign(manga, dto);
     return this.mangaRepo.save(manga);
   }
 
-  async remove(id: string) {
-    const manga = await this.findOne(id);
+  async remove(slum: string) {
+    const manga = await this.findOne(slum);
     return this.mangaRepo.remove(manga);
   }
 
-  async getMonthlyViews(mangaId: string) {
+  async getMonthlyViews(slug: string) {
     const manga = await this.mangaRepo.findOne({
-      where: { id: mangaId },
+      where: { slug },
       relations: ['chapters'],
     });
 
     if (!manga) {
       throw new NotFoundException('Manga not found');
     }
-    const chapterIds = manga.chapters.map((ch) => ch.id);
 
+    const chapterIds = manga.chapters.map((ch) => ch.id);
     return this.chapterViewsService.getMonthlyViewsForManga(chapterIds);
   }
 }

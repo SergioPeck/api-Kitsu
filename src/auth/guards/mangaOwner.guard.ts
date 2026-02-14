@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { MangaService } from 'src/mangas/mangas.service';
 
@@ -13,12 +14,13 @@ export class MangaOwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const mangaId = request.params.id;
 
-    const manga = await this.mangaService.findOne(mangaId);
+    const slum = request.params.slum;
+
+    const manga = await this.mangaService.findOne(slum);
 
     if (!manga) {
-      throw new ForbiddenException('Manga not found');
+      throw new NotFoundException('Manga not found');
     }
 
     if (user.role === 'ADMIN') return true;

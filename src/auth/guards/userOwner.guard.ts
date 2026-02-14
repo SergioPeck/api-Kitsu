@@ -13,7 +13,7 @@ export class UserOwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user; // viene del FirebaseAuthGuard
-    const userIdParam = request.params.id; // /users/:id
+    const userIdParam = request.params.slum; // /users/:id
 
     // Si es admin → permitir edición
     if (user.role === 'ADMIN') return true;

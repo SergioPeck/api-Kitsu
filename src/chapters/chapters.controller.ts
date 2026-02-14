@@ -29,6 +29,18 @@ export class ChaptersController {
   }
 
   @Public()
+  @Get(':slug/cap-:chapterNumber')
+  getChapterByMangaSlugAndNumber(
+    @Param('slug') slug: string,
+    @Param('chapterNumber') chapterNumber: string,
+  ): Promise<ChapterReaderResponse> {
+    return this.chaptersService.getReaderByMangaSlugAndNumber(
+      slug,
+      chapterNumber,
+    );
+  }
+
+  @Public()
   @Get(':chapterId')
   getChapter(
     @Param('chapterId') chapterId: string,
