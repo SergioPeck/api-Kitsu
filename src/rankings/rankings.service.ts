@@ -9,6 +9,7 @@ type MangaHistoricRankingRaw = {
   id: string;
   title: string;
   coverImage: string;
+  slug: string;
   views: string;
 };
 
@@ -28,6 +29,7 @@ export class RankingsService {
       .leftJoin('chapter.views', 'view')
       .select('manga.id', 'id')
       .addSelect('manga.title', 'title')
+      .addSelect('manga.slug', 'slug')
       .addSelect('manga.coverImage', 'coverImage')
       .addSelect('COUNT(view.id)', 'views')
       .groupBy('manga.id')
@@ -38,6 +40,7 @@ export class RankingsService {
     const items: MangaHistoricRankingDto[] = result.map((row) => ({
       id: row.id,
       title: row.title,
+      slug: row.slug,
       coverImage: row.coverImage,
       views: Number(row.views),
     }));
@@ -56,6 +59,7 @@ export class RankingsService {
       })
       .select('manga.id', 'id')
       .addSelect('manga.title', 'title')
+      .addSelect('manga.slug', 'slug')
       .addSelect('manga.coverImage', 'coverImage')
       .addSelect('COUNT(view.id)', 'views')
       .groupBy('manga.id')
@@ -73,6 +77,7 @@ export class RankingsService {
       items: items.map((item) => ({
         id: item.id,
         title: item.title,
+        slug: item.slug,
         coverImage: item.coverImage,
         views: Number(item.views),
       })),

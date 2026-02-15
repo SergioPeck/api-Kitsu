@@ -16,6 +16,7 @@ import { Chapter } from 'src/chapters/entities/chapter.entity';
 interface RecentMangaRaw {
   manga_id: string;
   manga_title: string;
+  manga_slug: string;
   manga_coverImage: string;
   lastChapterAt: Date;
 }
@@ -103,10 +104,17 @@ export class MangaService {
 
   async getRecentlyUpdated() {
     return this.mangaRepo.find({
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        coverImage: true,
+        lastChapterAt: true,
+      },
       order: {
         lastChapterAt: 'DESC',
       },
-      take: 10,
+      take: 12,
     });
   }
 
@@ -119,6 +127,7 @@ export class MangaService {
       .select([
         'manga.id AS manga_id',
         'manga.title AS manga_title',
+        'manga.slug AS manga_slug',
         'manga.coverImage AS "manga_coverImage"',
         'MAX(chapter.createdAt) AS "lastChapterAt"',
       ])
@@ -182,6 +191,7 @@ export class MangaService {
     const items: RecentMangaItem[] = mangas.map((m) => ({
       id: m.manga_id,
       title: m.manga_title,
+      slug: m.manga_slug,
       coverImage: m.manga_coverImage,
       firstChapter: firstChapterMap.get(m.manga_id) ?? null,
       lastChapters: lastChaptersMap.get(m.manga_id) ?? [],
@@ -195,14 +205,14 @@ export class MangaService {
     };
   }
 
-  async update(slum: string, dto: UpdateMangaDto) {
-    const manga = await this.findOne(slum);
+  async update(slug: string, dto: UpdateMangaDto) {
+    const manga = await this.findOne(slug);
     Object.assign(manga, dto);
     return this.mangaRepo.save(manga);
   }
 
-  async remove(slum: string) {
-    const manga = await this.findOne(slum);
+  async remove(slug: string) {
+    const manga = await this.findOne(slug);
     return this.mangaRepo.remove(manga);
   }
 

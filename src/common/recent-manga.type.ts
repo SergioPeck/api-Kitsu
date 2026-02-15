@@ -6,6 +6,7 @@ export interface ChapterRef {
 export interface RecentMangaItem {
   id: string;
   title: string;
+  slug: string;
   coverImage: string;
   firstChapter: ChapterRef | null;
   lastChapters: ChapterRef[];
