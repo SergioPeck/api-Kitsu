@@ -20,6 +20,7 @@ import { MangaOwnerGuard } from 'src/auth/guards/mangaOwner.guard';
 import { Public } from 'src/auth/guards/public.decorator';
 import { RecentMangaResponse } from 'src/common/recent-manga.type';
 import { ChapterListItemDto } from './dto/chapter-list-item.dto';
+import { ChaptersService } from 'src/chapters/chapters.service';
 
 export type ChaptersResponse = {
   chapters: ChapterListItemDto[];
@@ -27,7 +28,10 @@ export type ChaptersResponse = {
 
 @Controller('manga')
 export class MangaController {
-  constructor(private readonly mangaService: MangaService) {}
+  constructor(
+    private readonly mangaService: MangaService,
+    private readonly chaptersService: ChaptersService,
+  ) {}
 
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('ADMIN', 'UPLOADER')
@@ -58,15 +62,15 @@ export class MangaController {
   }
 
   @Public()
-  @Get(':slum')
-  findOne(@Param('slum') slum: string) {
-    return this.mangaService.findOne(slum);
+  @Get(':slug')
+  findOne(@Param('slug') slug: string) {
+    return this.mangaService.findOne(slug);
   }
 
   @Public()
-  @Get(':slum/chapters')
-  async getChapters(@Param('slum') slum: string): Promise<ChaptersResponse> {
-    const chapters = await this.mangaService.getChaptersByManga(slum);
+  @Get(':slug/chapters')
+  async getChapters(@Param('slug') slug: string): Promise<ChaptersResponse> {
+    const chapters = await this.mangaService.getChaptersByManga(slug);
 
     if (!chapters) {
       throw new NotFoundException('Manga not found');
@@ -75,16 +79,28 @@ export class MangaController {
     return { chapters };
   }
 
+  @Public()
+  @Get(':slug/cap-:chapterNumber')
+  getChapterBySlugAndNumber(
+    @Param('slug') slug: string,
+    @Param('chapterNumber') chapterNumber: string,
+  ) {
+    return this.chaptersService.getReaderByMangaSlugAndNumber(
+      slug,
+      chapterNumber,
+    );
+  }
+
   @UseGuards(FirebaseAuthGuard, RolesGuard, MangaOwnerGuard)
   @Roles('ADMIN')
-  @Patch(':slum')
-  update(@Param('slum') slum: string, @Body() dto: UpdateMangaDto) {
-    return this.mangaService.update(slum, dto);
+  @Patch(':slug')
+  update(@Param('slug') slug: string, @Body() dto: UpdateMangaDto) {
+    return this.mangaService.update(slug, dto);
   }
 
   @UseGuards(FirebaseAuthGuard, MangaOwnerGuard)
-  @Delete(':slum')
-  remove(@Param('slum') slum: string) {
-    return this.mangaService.remove(slum);
+  @Delete(':slug')
+  remove(@Param('slug') slug: string) {
+    return this.mangaService.remove(slug);
   }
 }

@@ -6,6 +6,7 @@ import { Manga } from './entities/mangas.entity';
 import { ChapterViewsModule } from '../chapter-views/chapter-views.module';
 import { UsersModule } from 'src/users/users.module';
 import { Chapter } from 'src/chapters/entities/chapter.entity';
+import { ChaptersModule } from 'src/chapters/chapters.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Chapter } from 'src/chapters/entities/chapter.entity';
     TypeOrmModule.forFeature([Chapter]),
     ChapterViewsModule,
     UsersModule,
+    ChaptersModule,
   ],
   controllers: [MangaController],
   providers: [MangaService],

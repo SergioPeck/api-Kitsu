@@ -4,6 +4,7 @@ export interface ChapterReaderResponse {
   title: string;
   images: string[];
   mangaId: string;
+  mangaSlug: string;
   prevChapterId: string | null;
   prevChapterNumber: number | null;
   nextChapterId: string | null;

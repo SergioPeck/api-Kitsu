@@ -51,6 +51,14 @@ export class ChaptersService {
 
     const { mangaId, chapterNumber } = chapter;
 
+    const manga = await this.mangaRepo.findOne({
+      where: { id: mangaId },
+      select: { slug: true },
+    });
+
+    if (!manga) {
+      throw new NotFoundException(`Manga not found (id: ${mangaId})`);
+    }
     const prevChapter = await this.chapterRepo.findOne({
       where: {
         mangaId,
@@ -75,6 +83,7 @@ export class ChaptersService {
       title: chapter.title,
       images: chapter.images,
       mangaId: chapter.mangaId,
+      mangaSlug: manga.slug,
       prevChapterId: prevChapter?.id ?? null,
       prevChapterNumber: prevChapter?.chapterNumber ?? null,
       nextChapterId: nextChapter?.id ?? null,

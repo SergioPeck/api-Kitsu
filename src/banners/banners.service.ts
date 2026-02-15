@@ -5,6 +5,17 @@ import { Banner } from './entities/banner.entity';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 
+type HomeBannerRaw = {
+  banner_id: string;
+  banner_imageUrl: string;
+  banner_isActive: boolean;
+  banner_sortOrder: number;
+  banner_mangaId: string;
+  banner_createdAt: Date;
+  banner_updatedAt: Date;
+  manga_slug: string;
+};
+
 @Injectable()
 export class BannersService {
   constructor(
@@ -30,10 +41,34 @@ export class BannersService {
   }
 
   async findHomeBanners() {
-    return this.bannersRepo.find({
-      where: { isActive: true },
-      order: { sortOrder: 'ASC', createdAt: 'DESC' },
-    });
+    const banners = await this.bannersRepo
+      .createQueryBuilder('banner')
+      .leftJoin('banner.manga', 'manga')
+      .where('banner.isActive = :active', { active: true })
+      .orderBy('banner.sortOrder', 'ASC')
+      .addOrderBy('banner.createdAt', 'DESC')
+      .select([
+        'banner.id',
+        'banner.imageUrl',
+        'banner.isActive',
+        'banner.sortOrder',
+        'banner.mangaId',
+        'banner.createdAt',
+        'banner.updatedAt',
+        'manga.slug',
+      ])
+      .getRawMany<HomeBannerRaw>();
+
+    return banners.map((b) => ({
+      id: b.banner_id,
+      imageUrl: b.banner_imageUrl,
+      isActive: b.banner_isActive,
+      sortOrder: b.banner_sortOrder,
+      mangaId: b.banner_mangaId,
+      createdAt: b.banner_createdAt,
+      updatedAt: b.banner_updatedAt,
+      mangaSlug: b.manga_slug,
+    }));
   }
 
   async findOne(id: string) {
