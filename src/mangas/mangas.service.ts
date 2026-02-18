@@ -118,7 +118,7 @@ export class MangaService {
     });
   }
 
-  async getRecentMangas(page = 1, limit = 10): Promise<RecentMangaResponse> {
+  async getRecentMangas(page = 1, limit = 12): Promise<RecentMangaResponse> {
     const offset = (page - 1) * limit;
 
     const mangas = await this.mangaRepo

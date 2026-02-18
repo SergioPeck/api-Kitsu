@@ -50,7 +50,7 @@ export class MangaController {
   @Get('recent')
   getRecentMangas(
     @Query('page') page = '1',
-    @Query('limit') limit = '10',
+    @Query('limit') limit = '12',
   ): Promise<RecentMangaResponse> {
     return this.mangaService.getRecentMangas(Number(page), Number(limit));
   }
